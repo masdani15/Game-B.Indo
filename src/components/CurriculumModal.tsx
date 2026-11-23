@@ -71,7 +71,7 @@ export const CurriculumModal: React.FC<CurriculumModalProps> = ({ isOpen, onClos
 
         <div className="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between gap-4">
           <p className="text-xs text-slate-500">
-            Bank soal berisi 480 butir soal (80 soal khusus di setiap level 1–6, termasuk Majas &amp; Idiom) tanpa menabrak antarlevel.
+            Bank soal berisi 624 butir soal (104 soal di tiap level 1–6: Pilihan Ganda, Benar/Salah, Lengkapi Kalimat, &amp; Susun Kata).
           </p>
           <button
             type="button"

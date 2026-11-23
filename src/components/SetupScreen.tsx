@@ -39,6 +39,15 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
 }) => {
   const modeMeta = GAME_MODE_META.find((g) => g.id === config.gameMode);
 
+  const formatDisplayMap: Record<TournamentConfig['questionFormat'], string> = {
+    all: 'Semua Bentuk',
+    pilihan_ganda: 'Pilihan Ganda',
+    benar_salah: 'Benar / Salah',
+    lengkapi_kalimat: 'Isian Rumpang',
+    susun_kata: 'Susun Kata',
+  };
+  const formatDisplay = formatDisplayMap[config.questionFormat];
+
   const levelDisplay =
     config.levelSelection === 'all'
       ? 'Semua (1–6)'
@@ -131,29 +140,35 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
               </span>
             </h1>
 
-            {/* Compact 4-Metric TV Stage Summary */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-              <div className="rounded-2xl bg-white/10 border border-white/20 p-3.5">
+            {/* Compact 5-Metric TV Stage Summary */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-1">
+              <div className="rounded-2xl bg-white/10 border border-white/20 p-3">
                 <div className="text-[11px] font-semibold text-sky-200">Kelompok</div>
-                <div className="font-display text-lg font-extrabold text-white font-mono-num">
+                <div className="font-display text-base font-extrabold text-white font-mono-num">
                   {config.teamCount} Tim
                 </div>
               </div>
-              <div className="rounded-2xl bg-white/10 border border-white/20 p-3.5">
-                <div className="text-[11px] font-semibold text-sky-200">Permainan</div>
-                <div className="font-display text-sm font-extrabold text-white truncate">
+              <div className="rounded-2xl bg-white/10 border border-white/20 p-3">
+                <div className="text-[11px] font-semibold text-sky-200">Materi</div>
+                <div className="font-display text-xs font-extrabold text-white truncate">
                   {modeMeta?.shortTitle}
                 </div>
               </div>
-              <div className="rounded-2xl bg-white/10 border border-white/20 p-3.5">
+              <div className="rounded-2xl bg-white/10 border border-white/20 p-3">
+                <div className="text-[11px] font-semibold text-sky-200">Bentuk</div>
+                <div className="font-display text-xs font-extrabold text-sky-300 truncate">
+                  {formatDisplay}
+                </div>
+              </div>
+              <div className="rounded-2xl bg-white/10 border border-white/20 p-3">
                 <div className="text-[11px] font-semibold text-sky-200">Level</div>
-                <div className="font-display text-sm font-extrabold text-amber-300 truncate">
+                <div className="font-display text-xs font-extrabold text-amber-300 truncate">
                   {levelDisplay}
                 </div>
               </div>
-              <div className="rounded-2xl bg-white/10 border border-white/20 p-3.5">
+              <div className="rounded-2xl bg-white/10 border border-white/20 p-3 col-span-2 sm:col-span-1">
                 <div className="text-[11px] font-semibold text-sky-200">Waktu</div>
-                <div className="font-display text-lg font-extrabold text-white font-mono-num">
+                <div className="font-display text-base font-extrabold text-white font-mono-num">
                   {config.sessionSeconds}d
                 </div>
               </div>

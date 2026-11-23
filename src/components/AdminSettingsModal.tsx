@@ -22,7 +22,12 @@ import {
 } from 'lucide-react';
 import { CURRICULUM_GUIDE } from '../data/curriculumGuide';
 import { GAME_MODE_META, TEAM_THEMES } from '../data/teamThemes';
-import { GameModeId, LevelSelection, TournamentConfig } from '../types/game';
+import {
+  GameModeId,
+  LevelSelection,
+  QuestionFormatSelection,
+  TournamentConfig,
+} from '../types/game';
 import { soundEngine } from '../utils/soundEngine';
 import { shuffleArray } from '../utils/tournamentEngine';
 import { TeamEmblem } from './TeamEmblem';
@@ -45,6 +50,17 @@ interface AdminSettingsModalProps {
 const ADMIN_PASSCODE = 'Cacing15';
 const PRESET_TEAM_COUNTS = [2, 3, 4, 5, 6, 7, 8, 10, 12];
 const SESSION_DURATIONS = [30, 45, 60, 90, 120];
+const QUESTION_FORMAT_OPTIONS: Array<{
+  id: QuestionFormatSelection;
+  label: string;
+  hint: string;
+}> = [
+  { id: 'all', label: 'Semua Bentuk', hint: 'Campur acak semua format' },
+  { id: 'pilihan_ganda', label: 'Pilihan Ganda', hint: '4 pilihan A / B / C / D' },
+  { id: 'benar_salah', label: 'Benar / Salah', hint: '2 tombol cepat pernyataan' },
+  { id: 'lengkapi_kalimat', label: 'Lengkapi Kalimat', hint: 'Isi kata rumpang' },
+  { id: 'susun_kata', label: 'Susun Kata', hint: 'Rakit urutan kata/kalimat' },
+];
 
 const SAMPLE_STUDENTS = [
   'Ahmad Fauzan',
@@ -319,7 +335,7 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
             <div className="rounded-2xl bg-white/80 border border-white p-5 flex flex-col gap-3">
               <div className="flex items-center gap-2 font-display text-sm font-extrabold text-slate-900">
                 <Layers size={17} className="text-sky-600" />
-                Kumpulan Game
+                Kumpulan Game (Materi)
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {GAME_MODE_META.map((mode) => {
@@ -328,7 +344,16 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
                     <button
                       key={mode.id}
                       type="button"
-                      onClick={() => onChangeConfig({ gameMode: mode.id as GameModeId })}
+                      onClick={() => {
+                        const nextMode = mode.id as GameModeId;
+                        if (nextMode === 'rakit_kalimat') {
+                          onChangeConfig({ gameMode: nextMode, questionFormat: 'susun_kata' });
+                        } else if (config.questionFormat === 'susun_kata') {
+                          onChangeConfig({ gameMode: nextMode, questionFormat: 'all' });
+                        } else {
+                          onChangeConfig({ gameMode: nextMode });
+                        }
+                      }}
                       className={`ifp-pop-btn text-left p-3.5 rounded-2xl border-2 border-b-4 cursor-pointer ${
                         selected
                           ? 'bg-sky-50 border-sky-500 text-slate-900'
@@ -338,6 +363,43 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
                       <div className="font-display text-sm font-extrabold">{mode.shortTitle}</div>
                       <div className="text-[11px] text-slate-500 mt-0.5 line-clamp-2">
                         {mode.description}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-white/80 border border-white p-5 flex flex-col gap-3">
+              <div className="flex items-center gap-2 font-display text-sm font-extrabold text-slate-900">
+                <ShieldCheck size={17} className="text-indigo-600" />
+                Bentuk Soal
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {QUESTION_FORMAT_OPTIONS.map((fmt) => {
+                  const selected = config.questionFormat === fmt.id;
+                  return (
+                    <button
+                      key={fmt.id}
+                      type="button"
+                      onClick={() => {
+                        if (fmt.id === 'susun_kata') {
+                          onChangeConfig({ questionFormat: fmt.id, gameMode: 'rakit_kalimat' });
+                        } else if (config.gameMode === 'rakit_kalimat' && fmt.id !== 'all') {
+                          onChangeConfig({ questionFormat: fmt.id, gameMode: 'campuran' });
+                        } else {
+                          onChangeConfig({ questionFormat: fmt.id });
+                        }
+                      }}
+                      className={`ifp-pop-btn text-left p-3 rounded-2xl border-2 border-b-4 cursor-pointer ${
+                        selected
+                          ? 'bg-indigo-50 border-indigo-500 text-slate-900'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="font-display text-xs font-extrabold">{fmt.label}</div>
+                      <div className="text-[11px] text-slate-500 mt-0.5 leading-tight">
+                        {fmt.hint}
                       </div>
                     </button>
                   );

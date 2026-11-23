@@ -13,9 +13,13 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import { MatchPairing, QuestionItem, TeamRecord } from '../types/game';
+import { MatchPairing, QuestionFormat, QuestionItem, TeamRecord } from '../types/game';
 import { soundEngine } from '../utils/soundEngine';
-import { shuffleArray, sortTeamsForLeaderboard } from '../utils/tournamentEngine';
+import {
+  getQuestionFormat,
+  shuffleArray,
+  sortTeamsForLeaderboard,
+} from '../utils/tournamentEngine';
 import { TeamEmblem } from './TeamEmblem';
 
 interface DualArenaProps {
@@ -61,6 +65,13 @@ const GAME_TYPE_LABEL: Record<QuestionItem['gameType'], string> = {
   detektif_ejaan: 'Detektif Ejaan',
   padan_kata: 'Padan Kata',
   majas_idiom: 'Majas & Idiom',
+};
+
+const FORMAT_BADGE_LABEL: Record<QuestionFormat, string> = {
+  pilihan_ganda: 'Pilihan Ganda',
+  benar_salah: 'Benar / Salah',
+  lengkapi_kalimat: 'Lengkapi Kalimat',
+  susun_kata: 'Susun Kata',
 };
 
 interface TeamPlaySideProps {
@@ -227,115 +238,174 @@ const TeamPlaySide: React.FC<TeamPlaySideProps> = ({
 
       {/* Main TV Broadcast Question Monitor */}
       <div className="flex-1 flex flex-col justify-center my-3 min-h-0">
-        {currentQuestion && (
-          <div
-            key={`${currentQuestion.id}-${questionNumber}`}
-            className="glass-panel rounded-3xl border-2 p-5 md:p-6 ifp-pop-card flex flex-col gap-4 animate-pop-in"
-            style={{ borderColor: team.theme.primary }}
-          >
-            <div className="flex items-center justify-between gap-2 text-xs font-extrabold">
-              <span
-                className="px-2.5 py-1 rounded-lg text-white"
-                style={{ backgroundColor: team.theme.primary }}
-              >
-                {GAME_TYPE_LABEL[currentQuestion.gameType]}
-              </span>
-              <span className="font-mono-num text-slate-500">
-                Level {currentQuestion.level} · Soal #{questionNumber}
-              </span>
-            </div>
+        {currentQuestion && (() => {
+          const questionFormat = getQuestionFormat(currentQuestion);
+          const promptParts =
+            questionFormat === 'lengkapi_kalimat'
+              ? currentQuestion.prompt.split('_____')
+              : null;
 
-            <h3 className="font-display text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">
-              {currentQuestion.prompt}
-            </h3>
-
-            {currentQuestion.gameType === 'rakit_kalimat' && currentQuestion.targetTokens ? (
-              <div className="flex flex-col gap-3.5">
-                <div className="min-h-[68px] rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 p-3 flex flex-wrap items-center gap-2">
-                  {selectedTokenIndices.length === 0 ? (
-                    <span className="text-sm text-slate-400 font-semibold">
-                      Susun {currentQuestion.targetTokens.length} bagian jawaban...
-                    </span>
-                  ) : (
-                    selectedTokenIndices.map((poolIdx, orderIdx) => (
-                      <button
-                        key={`${poolIdx}-${orderIdx}`}
-                        type="button"
-                        onPointerDown={(e) => handleTokenPointerDown(e, poolIdx)}
-                        className="ifp-pop-btn px-4 py-2 rounded-xl bg-indigo-600 border-b-4 border-indigo-900 text-white font-bold text-base md:text-lg"
-                      >
-                        {tokenPool[poolIdx]}
-                      </button>
-                    ))
-                  )}
+          return (
+            <div
+              key={`${currentQuestion.id}-${questionNumber}`}
+              className="glass-panel rounded-3xl border-2 p-5 md:p-6 ifp-pop-card flex flex-col gap-4 animate-pop-in"
+              style={{ borderColor: team.theme.primary }}
+            >
+              <div className="flex items-center justify-between gap-2 text-xs font-extrabold">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span
+                    className="px-2.5 py-1 rounded-lg text-white"
+                    style={{ backgroundColor: team.theme.primary }}
+                  >
+                    {FORMAT_BADGE_LABEL[questionFormat]}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">
+                    {GAME_TYPE_LABEL[currentQuestion.gameType]}
+                  </span>
                 </div>
+                <span className="font-mono-num text-slate-500 whitespace-nowrap">
+                  Level {currentQuestion.level} · #{questionNumber}
+                </span>
+              </div>
 
-                <div className="flex flex-wrap gap-2.5">
-                  {tokenPool.map((token, idx) => {
-                    const isUsed = selectedTokenIndices.includes(idx);
+              {promptParts && promptParts.length > 1 ? (
+                <h3 className="font-display text-xl md:text-2xl font-extrabold text-slate-900 leading-relaxed">
+                  {promptParts.map((part, idx) => (
+                    <React.Fragment key={idx}>
+                      {part}
+                      {idx < promptParts.length - 1 && (
+                        <span className="inline-flex items-center justify-center mx-1.5 px-4 py-0.5 rounded-xl border-2 border-dashed border-indigo-400 bg-indigo-50 text-indigo-600 font-mono-num text-base align-middle">
+                          .....
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </h3>
+              ) : (
+                <h3 className="font-display text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">
+                  {currentQuestion.prompt}
+                </h3>
+              )}
+
+              {questionFormat === 'susun_kata' && currentQuestion.targetTokens ? (
+                <div className="flex flex-col gap-3.5">
+                  <div className="min-h-[68px] rounded-2xl bg-slate-50 border-2 border-dashed border-slate-300 p-3 flex flex-wrap items-center gap-2">
+                    {selectedTokenIndices.length === 0 ? (
+                      <span className="text-sm text-slate-400 font-semibold">
+                        Susun {currentQuestion.targetTokens.length} bagian jawaban...
+                      </span>
+                    ) : (
+                      selectedTokenIndices.map((poolIdx, orderIdx) => (
+                        <button
+                          key={`${poolIdx}-${orderIdx}`}
+                          type="button"
+                          onPointerDown={(e) => handleTokenPointerDown(e, poolIdx)}
+                          className="ifp-pop-btn px-4 py-2 rounded-xl bg-indigo-600 border-b-4 border-indigo-900 text-white font-bold text-base md:text-lg"
+                        >
+                          {tokenPool[poolIdx]}
+                        </button>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {tokenPool.map((token, idx) => {
+                      const isUsed = selectedTokenIndices.includes(idx);
+                      return (
+                        <button
+                          key={`${token}-${idx}`}
+                          type="button"
+                          disabled={!isPlayable || isUsed}
+                          onPointerDown={(e) => handleTokenPointerDown(e, idx)}
+                          className={`ifp-pop-btn min-h-[56px] px-4 py-2.5 rounded-2xl border-2 border-b-4 font-bold text-base md:text-lg ${
+                            isUsed
+                              ? 'bg-slate-100 border-slate-200 text-slate-300 scale-95'
+                              : 'bg-white border-slate-300 text-slate-900 hover:border-sky-400'
+                          }`}
+                        >
+                          {token}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-end">
+                    <button
+                      type="button"
+                      onPointerDown={handleResetAssembly}
+                      className="ifp-pop-btn px-3.5 py-2 rounded-xl border-2 border-b-3 border-slate-200 bg-white text-xs font-bold text-slate-700 flex items-center gap-1.5"
+                    >
+                      <RotateCcw size={14} />
+                      Ulang
+                    </button>
+                  </div>
+                </div>
+              ) : questionFormat === 'benar_salah' ? (
+                <div className="grid grid-cols-2 gap-4 pt-1">
+                  {(currentQuestion.options ?? ['Benar', 'Salah']).map((opt, idx) => {
+                    const badgeLetter = idx === 0 ? 'B' : 'S';
                     return (
                       <button
-                        key={`${token}-${idx}`}
+                        key={`${currentQuestion.id}-bs-${opt}`}
                         type="button"
-                        disabled={!isPlayable || isUsed}
-                        onPointerDown={(e) => handleTokenPointerDown(e, idx)}
-                        className={`ifp-pop-btn min-h-[56px] px-4 py-2.5 rounded-2xl border-2 border-b-4 font-bold text-base md:text-lg ${
-                          isUsed
-                            ? 'bg-slate-100 border-slate-200 text-slate-300 scale-95'
-                            : 'bg-white border-slate-300 text-slate-900 hover:border-sky-400'
+                        disabled={!isPlayable}
+                        onPointerDown={(e) => handleOptionPointerDown(e, opt)}
+                        className={`ifp-pop-btn min-h-[104px] px-5 py-5 rounded-2xl border-2 border-b-4 flex flex-col items-center justify-center gap-2 cursor-pointer shadow-sm ${
+                          idx === 0
+                            ? 'bg-sky-50 hover:bg-sky-100 border-sky-300 border-b-sky-600 text-slate-900'
+                            : 'bg-indigo-50 hover:bg-indigo-100 border-indigo-300 border-b-indigo-600 text-slate-900'
                         }`}
                       >
-                        {token}
+                        <span
+                          className={`w-11 h-11 rounded-2xl flex items-center justify-center font-display font-extrabold text-xl text-white shadow-sm ${
+                            idx === 0 ? 'bg-sky-600' : 'bg-indigo-600'
+                          }`}
+                        >
+                          {badgeLetter}
+                        </span>
+                        <span className="font-display text-xl md:text-2xl font-extrabold uppercase tracking-wide">
+                          {opt}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
-
-                <div className="flex items-center justify-end">
-                  <button
-                    type="button"
-                    onPointerDown={handleResetAssembly}
-                    className="ifp-pop-btn px-3.5 py-2 rounded-xl border-2 border-b-3 border-slate-200 bg-white text-xs font-bold text-slate-700 flex items-center gap-1.5"
-                  >
-                    <RotateCcw size={14} />
-                    Ulang
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`grid gap-3 ${
-                  currentQuestion.gameType === 'detektif_ejaan'
-                    ? 'grid-cols-1'
-                    : 'grid-cols-1 sm:grid-cols-2'
-                }`}
-              >
-                {(currentQuestion.options ?? []).map((opt, idx) => {
-                  const optionLetter = String.fromCharCode(65 + idx);
-                  return (
-                    <button
-                      key={`${currentQuestion.id}-opt-${idx}`}
-                      type="button"
-                      disabled={!isPlayable}
-                      onPointerDown={(e) => handleOptionPointerDown(e, opt)}
-                      className="ifp-pop-btn min-h-[68px] md:min-h-[76px] px-4 py-3.5 rounded-2xl border-2 border-b-4 border-slate-300 bg-slate-50 hover:bg-white hover:border-sky-400 text-left flex items-center gap-3 cursor-pointer shadow-xs"
-                    >
-                      <span
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-extrabold text-base text-white shrink-0 shadow-sm border-b-2 border-black/25"
-                        style={{ backgroundColor: team.theme.primary }}
+              ) : (
+                <div
+                  className={`grid gap-3 ${
+                    questionFormat === 'pilihan_ganda' &&
+                    currentQuestion.gameType === 'detektif_ejaan'
+                      ? 'grid-cols-1'
+                      : 'grid-cols-1 sm:grid-cols-2'
+                  }`}
+                >
+                  {(currentQuestion.options ?? []).map((opt, idx) => {
+                    const optionLetter = String.fromCharCode(65 + idx);
+                    return (
+                      <button
+                        key={`${currentQuestion.id}-opt-${idx}`}
+                        type="button"
+                        disabled={!isPlayable}
+                        onPointerDown={(e) => handleOptionPointerDown(e, opt)}
+                        className="ifp-pop-btn min-h-[68px] md:min-h-[76px] px-4 py-3.5 rounded-2xl border-2 border-b-4 border-slate-300 bg-slate-50 hover:bg-white hover:border-sky-400 text-left flex items-center gap-3 cursor-pointer shadow-xs"
                       >
-                        {optionLetter}
-                      </span>
-                      <span className="font-bold text-base md:text-lg text-slate-900 leading-snug">
-                        {opt}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+                        <span
+                          className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-extrabold text-base text-white shrink-0 shadow-sm border-b-2 border-black/25"
+                          style={{ backgroundColor: team.theme.primary }}
+                        >
+                          {optionLetter}
+                        </span>
+                        <span className="font-bold text-base md:text-lg text-slate-900 leading-snug">
+                          {opt}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {/* Neutral TV Studio Wipe Overlay (Zero right/wrong reveal!) */}

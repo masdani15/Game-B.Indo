@@ -12,10 +12,19 @@ export type GameModeId =
 
 export type MiniGameType = Exclude<GameModeId, 'campuran'>;
 
+export type QuestionFormat =
+  | 'pilihan_ganda'
+  | 'benar_salah'
+  | 'lengkapi_kalimat'
+  | 'susun_kata';
+
+export type QuestionFormatSelection = 'all' | QuestionFormat;
+
 export interface QuestionItem {
   id: string;
   level: GradeLevel;
   gameType: MiniGameType;
+  format?: QuestionFormat;
   topic: string;
   prompt: string;
   hint?: string;
@@ -99,5 +108,6 @@ export interface TournamentConfig {
   teamCount: number;
   levelSelection: LevelSelection;
   gameMode: GameModeId;
+  questionFormat: QuestionFormatSelection;
   sessionSeconds: number;
 }

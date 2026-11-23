@@ -28,6 +28,7 @@ export default function App() {
     teamCount: 5,
     levelSelection: 'progressive',
     gameMode: 'campuran',
+    questionFormat: 'all',
     sessionSeconds: 60,
   });
 
@@ -132,6 +133,7 @@ export default function App() {
       level: effectiveLevel,
       levelSelection: config.levelSelection,
       gameMode: config.gameMode,
+      questionFormat: config.questionFormat,
       usedQuestionIds,
       deckSizePerTeam: 40,
     });

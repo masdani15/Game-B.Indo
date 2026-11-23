@@ -5,6 +5,8 @@ import {
   GradeLevel,
   LevelSelection,
   MatchPairing,
+  QuestionFormat,
+  QuestionFormatSelection,
   QuestionItem,
   TeamRecord,
   TournamentStage,
@@ -271,8 +273,14 @@ export function sortTeamsForLeaderboard(teams: TeamRecord[]): TeamRecord[] {
   });
 }
 
+export function getQuestionFormat(q: QuestionItem): QuestionFormat {
+  if (q.format) return q.format;
+  return q.gameType === 'rakit_kalimat' ? 'susun_kata' : 'pilihan_ganda';
+}
+
 function prepareQuestionVariant(q: QuestionItem): QuestionItem {
-  if (q.options) {
+  const fmt = getQuestionFormat(q);
+  if (q.options && fmt !== 'benar_salah') {
     return {
       ...q,
       options: shuffleArray(q.options),
@@ -324,6 +332,7 @@ export function drawUniqueDecksForMatch(params: {
   level: GradeLevel | 'all';
   levelSelection: LevelSelection;
   gameMode: GameModeId;
+  questionFormat?: QuestionFormatSelection;
   usedQuestionIds: Set<string>;
   deckSizePerTeam?: number;
 }): {
@@ -331,7 +340,13 @@ export function drawUniqueDecksForMatch(params: {
   deckB: QuestionItem[];
   newlyUsedIds: string[];
 } {
-  const { level, gameMode, usedQuestionIds, deckSizePerTeam = 36 } = params;
+  const {
+    level,
+    gameMode,
+    questionFormat = 'all',
+    usedQuestionIds,
+    deckSizePerTeam = 36,
+  } = params;
 
   // Strict level filter — NEVER bleed across levels unless 'all' is explicitly selected
   const levelPool =
@@ -344,7 +359,24 @@ export function drawUniqueDecksForMatch(params: {
       ? levelPool
       : levelPool.filter((q) => q.gameType === gameMode);
 
-  const activePool = modePool.length > 0 ? modePool : levelPool;
+  const formatPool =
+    questionFormat === 'all'
+      ? modePool
+      : modePool.filter((q) => getQuestionFormat(q) === questionFormat);
+
+  const formatFallbackWithinLevel =
+    questionFormat === 'all'
+      ? levelPool
+      : levelPool.filter((q) => getQuestionFormat(q) === questionFormat);
+
+  const activePool =
+    formatPool.length > 0
+      ? formatPool
+      : formatFallbackWithinLevel.length > 0
+      ? formatFallbackWithinLevel
+      : modePool.length > 0
+      ? modePool
+      : levelPool;
 
   const rawA = buildRandomizedStream(activePool, usedQuestionIds, deckSizePerTeam);
   const rawB = buildRandomizedStream(activePool, usedQuestionIds, deckSizePerTeam);

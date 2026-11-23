@@ -1,5 +1,6 @@
 import { QuestionItem } from '../types/game';
 import { EXTRA_QUESTIONS } from './questionsExtra';
+import { FORMAT_EXTRA_QUESTIONS } from './questionsFormatExtra';
 
 export const QUESTION_BANK: QuestionItem[] = [
   // ============================================================================
@@ -2153,4 +2154,5 @@ export const QUESTION_BANK: QuestionItem[] = [
     correctAnswer: 'bahan pembicaraan orang banyak',
   },
   ...EXTRA_QUESTIONS,
+  ...FORMAT_EXTRA_QUESTIONS,
 ];
