@@ -1750,11 +1750,11 @@ export const QUESTION_BANK: QuestionItem[] = [
     topic: 'Kelogisan Kalimat',
     prompt: 'Pilih kalimat yang paling EFEKTIF:',
     options: [
-      'Pencuri itu berhasil ditangkap polisi.',
-      'Pencuri itu berhasil menangkap polisi.',
+      'Bunga anggrek itu berhasil dirawat siswa.',
+      'Bunga anggrek itu berhasil merawat siswa.',
       'Bagi para hadirin dimohon untuk berdiri.',
     ],
-    correctAnswer: 'Pencuri itu berhasil ditangkap polisi.',
+    correctAnswer: 'Bunga anggrek itu berhasil dirawat siswa.',
   },
   {
     id: 'L6-DE-7',
@@ -1883,7 +1883,7 @@ export const QUESTION_BANK: QuestionItem[] = [
     gameType: 'majas_idiom',
     topic: 'Idiom (Ungkapan)',
     prompt: 'Anak yang selalu bersikap sopan dan tidak sombong disebut...',
-    options: ['rendah hati', 'besar kepala', 'keras kepala', 'panjang tangan'],
+    options: ['rendah hati', 'besar kepala', 'keras kepala', 'tinggi hati'],
     correctAnswer: 'rendah hati',
   },
   {
@@ -1892,7 +1892,7 @@ export const QUESTION_BANK: QuestionItem[] = [
     gameType: 'majas_idiom',
     topic: 'Idiom (Ungkapan)',
     prompt: 'Riko suka membantu teman yang kesulitan. Riko adalah anak yang...',
-    options: ['ringan tangan', 'panjang tangan', 'buah bibir', 'gigit jari'],
+    options: ['ringan tangan', 'besar kepala', 'buah bibir', 'gigit jari'],
     correctAnswer: 'ringan tangan',
   },
   {
@@ -1927,9 +1927,14 @@ export const QUESTION_BANK: QuestionItem[] = [
     level: 3,
     gameType: 'majas_idiom',
     topic: 'Idiom (Ungkapan)',
-    prompt: 'Jangan suka mengambil barang milik teman! Sifat suka mencuri disebut...',
-    options: ['panjang tangan', 'ringan tangan', 'tangan kanan', 'cuci tangan'],
-    correctAnswer: 'panjang tangan',
+    prompt: 'Para pahlawan yang berjasa besar bagi negeri sering disebut "bunga bangsa". Artinya adalah...',
+    options: [
+      'putra-putri terbaik kebanggaan bangsa',
+      'tanaman hias di halaman sekolah',
+      'peserta lomba menggambar',
+      'penjaga taman kota',
+    ],
+    correctAnswer: 'putra-putri terbaik kebanggaan bangsa',
   },
 
   // Level 4 (Majas Personifikasi, Simile & Idiom Populer)
@@ -2122,9 +2127,9 @@ export const QUESTION_BANK: QuestionItem[] = [
     level: 6,
     gameType: 'majas_idiom',
     topic: 'Idiom (Ungkapan)',
-    prompt: 'Jangan berteman dengan orang yang "bermuka dua". Arti ungkapan "bermuka dua" adalah...',
-    options: ['tidak jujur atau munafik', 'memiliki dua foto profil', 'sangat pandai berakting', 'memiliki kembaran identik'],
-    correctAnswer: 'tidak jujur atau munafik',
+    prompt: 'Kita harus selalu berkata jujur dan tidak bersikap "bermuka dua". Arti "bermuka dua" adalah...',
+    options: ['tidak jujur atau berpura-pura', 'memiliki dua foto profil', 'sangat pandai berakting', 'memiliki kembaran identik'],
+    correctAnswer: 'tidak jujur atau berpura-pura',
   },
   {
     id: 'L6-MI-6',
