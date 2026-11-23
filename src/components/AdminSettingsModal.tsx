@@ -3,11 +3,8 @@ import {
   BookOpen,
   Check,
   Clock,
-  Eye,
-  EyeOff,
   GraduationCap,
   Layers,
-  Lock,
   Maximize2,
   Minimize2,
   Minus,
@@ -15,10 +12,10 @@ import {
   RotateCcw,
   ShieldCheck,
   Shuffle,
+  SlidersHorizontal,
   Trash2,
   UserPlus,
   Users,
-  X,
 } from 'lucide-react';
 import { CURRICULUM_GUIDE } from '../data/curriculumGuide';
 import { GAME_MODE_META, TEAM_THEMES } from '../data/teamThemes';
@@ -47,7 +44,6 @@ interface AdminSettingsModalProps {
   onOpenCurriculum: () => void;
 }
 
-const ADMIN_PASSCODE = 'Cacing15';
 const PRESET_TEAM_COUNTS = [2, 3, 4, 5, 6, 7, 8, 10, 12];
 const SESSION_DURATIONS = [30, 45, 60, 90, 120];
 const QUESTION_FORMAT_OPTIONS: Array<{
@@ -116,35 +112,12 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
   onSetTeamMembers,
   onOpenCurriculum,
 }) => {
-  const [unlocked, setUnlocked] = useState(false);
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [authError, setAuthError] = useState(false);
   const [studentInput, setStudentInput] = useState('');
   const [generatorNotice, setGeneratorNotice] = useState('');
 
   const parsedStudents = useMemo(() => parseStudentNames(studentInput), [studentInput]);
 
   if (!isOpen) return null;
-
-  const handleCloseAndLock = () => {
-    setUnlocked(false);
-    setPassword('');
-    setAuthError(false);
-    onClose();
-  };
-
-  const handleUnlockSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSCODE) {
-      soundEngine.playAnswerSubmit();
-      setUnlocked(true);
-      setAuthError(false);
-      setPassword('');
-    } else {
-      setAuthError(true);
-    }
-  };
 
   const distributeStudents = (names: string[], groupCount: number) => {
     if (names.length === 0) return;
@@ -188,92 +161,6 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
     (name, idx) => name.trim().length > 0 && name.trim() !== `Kelompok ${idx + 1}`
   );
 
-  // Password Gate Screen
-  if (!unlocked) {
-    return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 backdrop-blur-md p-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="admin-lock-title"
-      >
-        <form
-          onSubmit={handleUnlockSubmit}
-          className={`glass-panel rounded-3xl w-full max-w-md p-7 flex flex-col gap-5 animate-pop-in ${
-            authError ? 'animate-shake' : ''
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
-                <Lock size={20} />
-              </div>
-              <div>
-                <h2 id="admin-lock-title" className="font-display text-lg font-extrabold text-slate-900">
-                  Panel Pengaturan Admin
-                </h2>
-                <p className="text-xs text-slate-500">Masukkan sandi admin</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleCloseAndLock}
-              className="ifp-pop-btn p-2 rounded-xl bg-white/80 border border-slate-200 text-slate-600 hover:text-slate-900 cursor-pointer"
-              aria-label="Tutup"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (authError) setAuthError(false);
-              }}
-              placeholder="Sandi admin..."
-              autoFocus
-              className="w-full rounded-2xl border-2 border-slate-200 bg-white/90 px-4 py-3.5 pr-12 text-base font-bold text-slate-900 focus:outline-none focus:border-sky-500"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-slate-500 hover:text-slate-800 cursor-pointer"
-              aria-label={showPassword ? 'Sembunyikan sandi' : 'Lihat sandi'}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
-          {authError && (
-            <p className="text-xs font-bold text-rose-600">
-              Sandi salah. Silakan coba lagi.
-            </p>
-          )}
-
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={handleCloseAndLock}
-              className="ifp-pop-btn flex-1 py-3 rounded-2xl bg-white border-2 border-b-4 border-slate-200 text-sm font-bold text-slate-700 cursor-pointer"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              className="ifp-pop-btn flex-1 py-3 rounded-2xl bg-sky-600 hover:bg-sky-500 border-b-4 border-sky-800 text-sm font-extrabold text-white cursor-pointer"
-            >
-              Buka Pengaturan
-            </button>
-          </div>
-        </form>
-      </div>
-    );
-  }
-
-  // Unlocked Admin Settings Modal
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-md p-4 md:p-6"
@@ -286,7 +173,7 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
         <div className="px-6 py-4 border-b border-slate-200/80 bg-white/60 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center">
-              <ShieldCheck size={20} />
+              <SlidersHorizontal size={20} />
             </div>
             <div>
               <h2 id="admin-settings-title" className="font-display text-lg font-extrabold text-slate-900">
@@ -319,11 +206,11 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={handleCloseAndLock}
+              onClick={onClose}
               className="ifp-pop-btn px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border-b-4 border-slate-950 text-white text-xs font-extrabold flex items-center gap-1.5 cursor-pointer"
             >
               <Check size={15} />
-              Selesai & Kunci
+              Selesai
             </button>
           </div>
         </div>

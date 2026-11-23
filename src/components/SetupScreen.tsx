@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  Lock,
   Maximize2,
   Minimize2,
   Play,
+  SlidersHorizontal,
   Sparkles,
   Tv,
   Volume2,
@@ -117,7 +117,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
               onClick={onOpenAdminSettings}
               className="ifp-pop-btn px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 border-b-4 border-amber-600 text-slate-950 text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
             >
-              <Lock size={14} />
+              <SlidersHorizontal size={14} />
               Panel Pengaturan
             </button>
           </div>
@@ -189,7 +189,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
                 onClick={onOpenAdminSettings}
                 className="ifp-pop-btn px-5 py-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/25 border-b-4 border-b-slate-950/70 text-white text-sm font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer"
               >
-                <Lock size={16} />
+                <SlidersHorizontal size={16} />
                 Pengaturan &amp; Waktu
               </button>
             </div>

@@ -2,12 +2,12 @@ import React from 'react';
 import {
   ArrowLeft,
   ArrowRight,
-  Lock,
   Maximize2,
   Minimize2,
   Play,
   RotateCcw,
   Shuffle,
+  SlidersHorizontal,
   Trophy,
   Tv,
   Volume2,
@@ -125,8 +125,8 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
               onClick={onOpenAdminSettings}
               className="ifp-pop-btn px-3.5 py-2 rounded-xl border border-white/20 border-b-4 border-b-slate-950/60 bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
             >
-              <Lock size={14} />
-              Admin
+              <SlidersHorizontal size={14} />
+              Pengaturan
             </button>
 
             {canReshuffleBracket && (
