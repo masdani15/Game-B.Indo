@@ -123,12 +123,17 @@ export default function App() {
     const targetMatch = matches.find((m) => m.id === matchId);
     if (!targetMatch || !targetMatch.teamAId || !targetMatch.teamBId) return;
 
+    const effectiveLevel =
+      config.levelSelection === 'progressive'
+        ? targetMatch.levelUsed
+        : config.levelSelection;
+
     const { deckA, deckB, newlyUsedIds } = drawUniqueDecksForMatch({
-      level: targetMatch.levelUsed,
+      level: effectiveLevel,
       levelSelection: config.levelSelection,
       gameMode: config.gameMode,
       usedQuestionIds,
-      deckSizePerTeam: 24,
+      deckSizePerTeam: 40,
     });
 
     setUsedQuestionIds((prev) => {

@@ -91,6 +91,19 @@ class SoundEngine {
     this.playTone(940, 0.045, 'sine', 0.07, 0);
   }
 
+  /**
+   * Dramatic TV quiz show countdown tick played every second for the final 10 seconds.
+   */
+  public playCountdownSecond(secondsLeft: number) {
+    if (secondsLeft <= 0 || secondsLeft > 10) return;
+    const isFinalFive = secondsLeft <= 5;
+    const baseFreq = isFinalFive
+      ? 987.77 + (5 - secondsLeft) * 85
+      : 783.99 + (10 - secondsLeft) * 28;
+    this.playTone(baseFreq, isFinalFive ? 0.14 : 0.09, 'triangle', isFinalFive ? 0.19 : 0.13, 0);
+    this.playTone(baseFreq * 1.5, 0.06, 'sine', isFinalFive ? 0.12 : 0.08, 0.02);
+  }
+
   public playMatchEnd() {
     const notes = [523.25, 659.25, 783.99, 1046.5];
     notes.forEach((n, idx) => {

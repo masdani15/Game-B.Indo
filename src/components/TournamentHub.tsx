@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Shuffle,
   Trophy,
+  Tv,
   Volume2,
   VolumeX,
 } from 'lucide-react';
@@ -61,43 +62,49 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
     (a, b) => a - b
   );
 
+  const formatLevelLabel = (lvl: MatchPairing['levelUsed']) =>
+    lvl === 'all' ? 'Semua Level (1–6)' : `Level ${lvl}`;
+
   return (
-    <div className="min-h-screen relative overflow-hidden flex flex-col">
-      {/* Subtle Ambient Orbs */}
+    <div className="min-h-screen relative overflow-hidden flex flex-col tv-stage-grid text-white">
+      {/* TV Studio Spotlights */}
       <div
-        className="pointer-events-none fixed -top-32 -left-32 w-[420px] h-[420px] rounded-full bg-sky-300/30 blur-3xl"
+        className="pointer-events-none fixed -top-32 -left-32 w-[460px] h-[460px] rounded-full bg-sky-500/20 blur-3xl"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none fixed bottom-0 -right-32 w-[460px] h-[460px] rounded-full bg-indigo-200/35 blur-3xl"
+        className="pointer-events-none fixed bottom-0 -right-32 w-[480px] h-[480px] rounded-full bg-amber-400/15 blur-3xl"
         aria-hidden="true"
       />
 
-      {/* Header */}
+      {/* Broadcast Header */}
       <header className="relative z-20 px-6 py-4">
-        <div className="max-w-7xl mx-auto glass-panel rounded-2xl px-5 py-3 flex items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto glass-studio rounded-2xl px-5 py-3 flex items-center justify-between gap-6">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={onResetToSetup}
-              className="ifp-pop-btn px-3.5 py-2 rounded-xl border-2 border-b-4 border-slate-200 bg-white text-xs font-bold text-slate-700 flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
+              className="ifp-pop-btn px-3.5 py-2 rounded-xl border border-white/25 border-b-4 border-b-slate-950/70 bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
             >
               <ArrowLeft size={15} />
               Beranda
             </button>
-            <h1 className="font-display text-base md:text-lg font-extrabold text-slate-900 truncate">
-              Bagan & Papan Skor ({teams.length} Kelompok)
-            </h1>
+            <div className="flex items-center gap-2 min-w-0">
+              <Tv size={18} className="text-amber-300 shrink-0" />
+              <h1 className="font-display text-base md:text-lg font-extrabold text-white truncate">
+                Papan Klasemen &amp; Bagan TV ({teams.length} Kelompok)
+              </h1>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               onClick={onToggleFullscreen}
-              className={`ifp-pop-btn px-3 py-2 rounded-xl border-2 border-b-4 text-xs font-bold flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
+              className={`ifp-pop-btn px-3 py-2 rounded-xl border-2 border-b-4 text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 isFullscreen
                   ? 'bg-amber-400 border-amber-600 text-slate-950'
-                  : 'bg-white border-slate-200 text-slate-800'
+                  : 'bg-white/10 hover:bg-white/20 border-white/20 border-b-slate-950/60 text-white'
               }`}
             >
               {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
@@ -107,7 +114,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
             <button
               type="button"
               onClick={onToggleMute}
-              className="ifp-pop-btn p-2 rounded-xl border-2 border-b-4 border-slate-200 bg-white text-slate-700 cursor-pointer"
+              className="ifp-pop-btn p-2 rounded-xl border border-white/20 border-b-4 border-b-slate-950/60 bg-white/10 hover:bg-white/20 text-white cursor-pointer"
               aria-label={isMuted ? 'Aktifkan suara' : 'Matikan suara'}
             >
               {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
@@ -116,7 +123,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
             <button
               type="button"
               onClick={onOpenAdminSettings}
-              className="ifp-pop-btn px-3.5 py-2 rounded-xl border-2 border-b-4 border-slate-200 bg-white text-xs font-bold text-slate-800 flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+              className="ifp-pop-btn px-3.5 py-2 rounded-xl border border-white/20 border-b-4 border-b-slate-950/60 bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
             >
               <Lock size={14} />
               Admin
@@ -126,7 +133,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
               <button
                 type="button"
                 onClick={onReshuffleBracket}
-                className="ifp-pop-btn px-3.5 py-2 rounded-xl border-2 border-b-4 border-slate-200 bg-white text-slate-800 text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
+                className="ifp-pop-btn px-3.5 py-2 rounded-xl border border-white/20 border-b-4 border-b-slate-950/60 bg-white/10 hover:bg-white/20 text-white text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap cursor-pointer"
               >
                 <Shuffle size={14} />
                 Undi Lawan
@@ -137,7 +144,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
               <button
                 type="button"
                 onClick={() => onStartMatch(nextPlayableMatch.id)}
-                className="ifp-pop-btn px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 border-b-4 border-sky-800 text-white text-sm font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                className="ifp-pop-btn px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 border-b-4 border-amber-600 text-slate-950 text-sm font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer"
               >
                 <Play size={15} fill="currentColor" />
                 Mulai Laga
@@ -159,18 +166,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
       </header>
 
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Minimalist Glass Leaderboard (Scores & Wins ONLY) */}
+        {/* Left: Live TV Leaderboard (Scores & Wins ONLY) */}
         <section className="lg:col-span-5 glass-panel rounded-3xl p-5 flex flex-col gap-4 ifp-pop-card">
-          <h2 className="font-display text-lg font-extrabold text-slate-900">
-            Papan Skor Otomatis
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-extrabold text-slate-900">
+              Papan Skor Real-Time
+            </h2>
+            <span className="text-xs font-extrabold text-sky-700">Klasemen</span>
+          </div>
 
-          <div className="divide-y divide-slate-200/70 rounded-2xl overflow-hidden bg-white/80 border border-white max-h-[560px] overflow-y-auto">
-            <div className="grid grid-cols-12 gap-2 px-4 py-2.5 bg-slate-100/80 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider sticky top-0">
+          <div className="divide-y divide-slate-200/70 rounded-2xl overflow-hidden bg-white border border-slate-200 max-h-[560px] overflow-y-auto">
+            <div className="grid grid-cols-12 gap-2 px-4 py-2.5 bg-slate-900 text-[11px] font-extrabold text-amber-300 uppercase tracking-wider sticky top-0">
               <span className="col-span-1">#</span>
               <span className="col-span-7">Kelompok</span>
               <span className="col-span-2 text-right">Menang</span>
-              <span className="col-span-2 text-right">Poin</span>
+              <span className="col-span-2 text-right">Skor</span>
             </div>
 
             {leaderboard.map((team, idx) => {
@@ -185,9 +195,9 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   key={team.id}
                   className={`grid grid-cols-12 gap-2 px-4 py-3 items-center ${
                     team.eliminated
-                      ? 'opacity-60'
+                      ? 'opacity-55'
                       : rank === 1 && team.totalPoints > 0
-                      ? 'bg-amber-50/70'
+                      ? 'bg-amber-50'
                       : ''
                   }`}
                 >
@@ -202,7 +212,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                         {team.eliminated
                           ? 'Gugur'
                           : tournamentFinished && rank === 1
-                          ? 'Juara'
+                          ? 'Juara Utama'
                           : isByeThisRound
                           ? 'Lolos Otomatis'
                           : 'Aktif'}
@@ -221,16 +231,17 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
           </div>
         </section>
 
-        {/* Right: Dynamic Knockout Rounds & Automatic Bye */}
+        {/* Right: TV Broadcast Matchup Cards & Automatic Bye */}
         <section className="lg:col-span-7 flex flex-col gap-5">
           {nextPlayableMatch && (
-            <div className="rounded-3xl bg-sky-600 border-b-4 border-sky-800 text-white p-6 ifp-pop-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div className="rounded-3xl bg-gradient-to-r from-sky-600 via-indigo-600 to-blue-700 border-2 border-amber-300/60 border-b-4 border-b-indigo-950 text-white p-6 ifp-pop-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
               <div>
-                <span className="text-xs font-bold text-sky-100">
-                  {nextPlayableMatch.label} · Level {nextPlayableMatch.levelUsed}
+                <span className="text-xs font-extrabold text-amber-300 uppercase tracking-wider">
+                  {nextPlayableMatch.label} · {formatLevelLabel(nextPlayableMatch.levelUsed)}
                 </span>
-                <h2 className="font-display text-2xl font-extrabold mt-0.5">
-                  {teamMap.get(nextPlayableMatch.teamAId!)?.name} vs{' '}
+                <h2 className="font-display text-2xl md:text-3xl font-extrabold mt-1">
+                  {teamMap.get(nextPlayableMatch.teamAId!)?.name}{' '}
+                  <span className="text-amber-300 mx-1">VS</span>{' '}
                   {teamMap.get(nextPlayableMatch.teamBId!)?.name}
                 </h2>
               </div>
@@ -239,7 +250,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                   <button
                     type="button"
                     onClick={onReshuffleBracket}
-                    className="ifp-pop-btn px-4 py-3.5 rounded-2xl bg-sky-700 hover:bg-sky-800 border-b-4 border-sky-900 text-white text-sm font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                    className="ifp-pop-btn px-4 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/30 border-b-4 border-b-indigo-950 text-white text-sm font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer"
                   >
                     <Shuffle size={16} />
                     Undi Ulang
@@ -248,19 +259,21 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 <button
                   type="button"
                   onClick={() => onStartMatch(nextPlayableMatch.id)}
-                  className="ifp-pop-btn px-6 py-3.5 rounded-2xl bg-white text-sky-700 border-b-4 border-sky-200 text-base font-extrabold hover:bg-sky-50 flex items-center gap-2 whitespace-nowrap cursor-pointer"
+                  className="ifp-pop-btn px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-300 hover:from-amber-300 hover:to-yellow-200 border-b-4 border-amber-600 text-slate-950 text-base font-extrabold flex items-center gap-2 whitespace-nowrap cursor-pointer shadow-lg"
                 >
                   <Play size={18} fill="currentColor" />
-                  Masuk Arena
+                  Masuk Panggung
                 </button>
               </div>
             </div>
           )}
 
           {tournamentFinished && (
-            <div className="rounded-3xl bg-amber-400 border-b-4 border-amber-600 text-slate-950 p-6 ifp-pop-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="rounded-3xl bg-gradient-to-r from-amber-400 to-yellow-300 border-b-4 border-amber-600 text-slate-950 p-6 ifp-pop-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <span className="text-xs font-bold text-amber-900">Kompetisi Selesai</span>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-amber-900">
+                  Kompetisi Selesai
+                </span>
                 <h2 className="font-display text-2xl font-extrabold">
                   Juara: {leaderboard[0]?.name}
                 </h2>
@@ -308,7 +321,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                 </div>
 
                 {byeTeam && (
-                  <div className="rounded-2xl border border-emerald-200 bg-emerald-50/85 px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <TeamEmblem
                         emblem={byeTeam.theme.emblem}
@@ -336,8 +349,8 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                     return (
                       <div
                         key={m.id}
-                        className={`rounded-2xl border-2 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/85 ${
-                          isNext ? 'border-sky-400' : 'border-white'
+                        className={`rounded-2xl border-2 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white ${
+                          isNext ? 'border-sky-500 shadow-sm' : 'border-slate-200'
                         }`}
                       >
                         <div className="flex items-center gap-3 flex-wrap flex-1 min-w-0">
@@ -364,7 +377,7 @@ export const TournamentHub: React.FC<TournamentHubProps> = ({
                             )}
                           </div>
 
-                          <div className="font-mono-num text-sm font-extrabold px-2.5 py-1 rounded-xl bg-slate-100 text-slate-800">
+                          <div className="font-mono-num text-xs font-extrabold px-3 py-1 rounded-xl bg-slate-900 text-amber-300">
                             {m.status === 'completed' ? `${m.scoreA} : ${m.scoreB}` : 'VS'}
                           </div>
 

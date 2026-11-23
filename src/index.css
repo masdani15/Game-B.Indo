@@ -3,7 +3,11 @@
 @layer base {
   body {
     font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #eef4ff 0%, #f8fafc 48%, #ecfeff 100%);
+    background:
+      radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.22) 0%, transparent 45%),
+      radial-gradient(circle at 80% 0%, rgba(251, 191, 36, 0.16) 0%, transparent 42%),
+      linear-gradient(160deg, #070e23 0%, #0d1b3e 48%, #08122c 100%);
+    color: #f8fafc;
     min-height: 100vh;
   }
 
@@ -33,20 +37,41 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Glassmorphic surfaces & tactile pop controls */
+/* TV Quiz Show Studio Glass & Broadcast Surfaces */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.93);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 18px 42px -12px rgba(2, 6, 23, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  color: #0f172a;
+}
+
+.glass-studio {
+  background: rgba(10, 20, 48, 0.78);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 12px 36px -10px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(148, 163, 184, 0.25);
+  box-shadow:
+    0 14px 36px -10px rgba(2, 6, 23, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.78);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(8, 15, 36, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.5);
+}
+
+.tv-stage-grid {
+  background-image:
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
 }
 
 .ifp-pop-btn {
@@ -56,15 +81,18 @@
   -webkit-tap-highlight-color: transparent;
   transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1),
     box-shadow 140ms ease,
-    background-color 140ms ease;
+    background-color 140ms ease,
+    border-color 140ms ease;
 }
 
 .ifp-pop-btn:active:not(:disabled) {
-  transform: translateY(2px) scale(0.975);
+  transform: translateY(3px) scale(0.975);
 }
 
 .ifp-pop-card {
-  box-shadow: 0 8px 0 rgba(15, 23, 42, 0.05), 0 18px 36px -12px rgba(15, 23, 42, 0.12);
+  box-shadow:
+    0 10px 0 rgba(2, 6, 23, 0.24),
+    0 24px 48px -12px rgba(2, 6, 23, 0.55);
 }
 
 @keyframes pop-in {
@@ -87,7 +115,7 @@
     transform: scale(1);
   }
   45% {
-    transform: scale(1.24);
+    transform: scale(1.26);
   }
   100% {
     transform: scale(1);
@@ -102,6 +130,17 @@
   80% { transform: translateX(4px); }
 }
 
+@keyframes tv-red-glow {
+  0%, 100% {
+    box-shadow: 0 0 22px rgba(239, 68, 68, 0.8), 0 0 46px rgba(220, 38, 38, 0.55);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 38px rgba(248, 113, 113, 1), 0 0 70px rgba(239, 68, 68, 0.85);
+    transform: scale(1.05);
+  }
+}
+
 .animate-pop-in {
   animation: pop-in 210ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
@@ -112,4 +151,8 @@
 
 .animate-shake {
   animation: gentle-shake 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-tv-red-glow {
+  animation: tv-red-glow 650ms ease-in-out infinite;
 }

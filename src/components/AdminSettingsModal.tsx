@@ -44,7 +44,7 @@ interface AdminSettingsModalProps {
 
 const ADMIN_PASSCODE = 'Cacing15';
 const PRESET_TEAM_COUNTS = [2, 3, 4, 5, 6, 7, 8, 10, 12];
-const SESSION_DURATIONS: Array<45 | 60 | 90> = [45, 60, 90];
+const SESSION_DURATIONS = [30, 45, 60, 90, 120];
 
 const SAMPLE_STUDENTS = [
   'Ahmad Fauzan',
@@ -351,22 +351,43 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
                 Level Materi (Kelas 1–6 SD)
               </div>
 
-              <button
-                type="button"
-                onClick={() => onChangeConfig({ levelSelection: 'progressive' })}
-                className={`ifp-pop-btn text-left p-3.5 rounded-2xl border-2 border-b-4 cursor-pointer flex items-center justify-between ${
-                  config.levelSelection === 'progressive'
-                    ? 'bg-amber-50 border-amber-500 text-slate-900'
-                    : 'bg-white border-slate-200 text-slate-700'
-                }`}
-              >
-                <span className="font-display text-sm font-extrabold">
-                  Mode Berjenjang (Mudah → Susah)
-                </span>
-                <span className="text-xs font-bold text-amber-700">
-                  {config.levelSelection === 'progressive' ? 'Aktif' : 'Pilih'}
-                </span>
-              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => onChangeConfig({ levelSelection: 'progressive' })}
+                  className={`ifp-pop-btn text-left p-3.5 rounded-2xl border-2 border-b-4 cursor-pointer flex items-center justify-between ${
+                    config.levelSelection === 'progressive'
+                      ? 'bg-amber-50 border-amber-500 text-slate-900'
+                      : 'bg-white border-slate-200 text-slate-700'
+                  }`}
+                >
+                  <div>
+                    <div className="font-display text-sm font-extrabold">Berjenjang (1 → 6)</div>
+                    <div className="text-[11px] text-slate-500">Naik level tiap babak</div>
+                  </div>
+                  <span className="text-xs font-bold text-amber-700">
+                    {config.levelSelection === 'progressive' ? 'Aktif' : 'Pilih'}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onChangeConfig({ levelSelection: 'all' })}
+                  className={`ifp-pop-btn text-left p-3.5 rounded-2xl border-2 border-b-4 cursor-pointer flex items-center justify-between ${
+                    config.levelSelection === 'all'
+                      ? 'bg-indigo-50 border-indigo-500 text-slate-900'
+                      : 'bg-white border-slate-200 text-slate-700'
+                  }`}
+                >
+                  <div>
+                    <div className="font-display text-sm font-extrabold">Semua Level</div>
+                    <div className="text-[11px] text-slate-500">Campur acak Kelas 1–6</div>
+                  </div>
+                  <span className="text-xs font-bold text-indigo-700">
+                    {config.levelSelection === 'all' ? 'Aktif' : 'Pilih'}
+                  </span>
+                </button>
+              </div>
 
               <div className="grid grid-cols-3 gap-2.5">
                 {CURRICULUM_GUIDE.map((lvl) => {
@@ -393,11 +414,57 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
             </div>
 
             <div className="rounded-2xl bg-white/80 border border-white p-5 flex flex-col gap-3">
-              <div className="flex items-center gap-2 font-display text-sm font-extrabold text-slate-900">
-                <Clock size={17} className="text-emerald-600" />
-                Durasi Tiap Sesi
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 font-display text-sm font-extrabold text-slate-900">
+                  <Clock size={17} className="text-emerald-600" />
+                  Atur Waktu Tiap Sesi
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChangeConfig({
+                        sessionSeconds: Math.max(15, config.sessionSeconds - 5),
+                      })
+                    }
+                    disabled={config.sessionSeconds <= 15}
+                    className="ifp-pop-btn px-2.5 h-8 rounded-lg bg-white border-2 border-b-3 border-slate-200 text-xs font-extrabold text-slate-700 disabled:opacity-40 cursor-pointer"
+                  >
+                    -5d
+                  </button>
+                  <input
+                    type="number"
+                    min={15}
+                    max={300}
+                    step={5}
+                    value={config.sessionSeconds}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (!Number.isNaN(val)) {
+                        onChangeConfig({
+                          sessionSeconds: Math.max(15, Math.min(300, Math.round(val))),
+                        });
+                      }
+                    }}
+                    aria-label="Durasi sesi dalam detik"
+                    className="w-16 text-center font-mono-num text-sm font-extrabold bg-white border-2 border-slate-200 rounded-lg py-1 text-slate-900 focus:outline-none focus:border-sky-500"
+                  />
+                  <span className="text-xs font-bold text-slate-500">dtk</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChangeConfig({
+                        sessionSeconds: Math.min(300, config.sessionSeconds + 5),
+                      })
+                    }
+                    disabled={config.sessionSeconds >= 300}
+                    className="ifp-pop-btn px-2.5 h-8 rounded-lg bg-white border-2 border-b-3 border-slate-200 text-xs font-extrabold text-slate-700 disabled:opacity-40 cursor-pointer"
+                  >
+                    +5d
+                  </button>
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-5 gap-2">
                 {SESSION_DURATIONS.map((sec) => {
                   const active = config.sessionSeconds === sec;
                   return (
@@ -411,7 +478,7 @@ export const AdminSettingsModal: React.FC<AdminSettingsModalProps> = ({
                           : 'bg-white border-slate-200 text-slate-700'
                       }`}
                     >
-                      {sec} Detik
+                      {sec}d
                     </button>
                   );
                 })}

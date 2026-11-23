@@ -22,7 +22,8 @@ export function shuffleArray<T>(items: T[]): T[] {
 export function resolveLevelForStage(
   selection: LevelSelection,
   stage: TournamentStage
-): GradeLevel {
+): GradeLevel | 'all' {
+  if (selection === 'all') return 'all';
   if (selection !== 'progressive') return selection;
   switch (stage) {
     case 'PENYISIHAN':
@@ -66,7 +67,7 @@ function makeEmptyMatch(params: {
   label: string;
   teamAId: string | null;
   teamBId: string | null;
-  levelUsed: GradeLevel;
+  levelUsed: GradeLevel | 'all';
 }): MatchPairing {
   return {
     id: params.id,
@@ -117,7 +118,7 @@ export function createKnockoutRound(params: {
   const { stage, title } = getStageMetaForRound(activeTeams.length, roundNumber);
   const levelUsed = resolveLevelForStage(levelSelection, stage);
 
-  let ordered = shuffleArray(activeTeams);
+  const ordered = shuffleArray(activeTeams);
 
   // If odd count and someone had a Bye last round, ensure they are NOT placed in the last (Bye) slot
   if (ordered.length % 2 === 1 && previousByeTeamId && ordered.length >= 3) {
@@ -280,13 +281,47 @@ function prepareQuestionVariant(q: QuestionItem): QuestionItem {
   return { ...q };
 }
 
+function buildRandomizedStream(
+  pool: QuestionItem[],
+  usedQuestionIds: Set<string>,
+  targetSize: number
+): QuestionItem[] {
+  if (pool.length === 0) return [];
+
+  const unseen = shuffleArray(pool.filter((q) => !usedQuestionIds.has(q.id)));
+  const seen = shuffleArray(pool.filter((q) => usedQuestionIds.has(q.id)));
+
+  const stream: QuestionItem[] = [...unseen, ...seen];
+
+  while (stream.length < targetSize) {
+    const nextCycle = shuffleArray(pool);
+    // Avoid immediate duplicate across cycle boundary
+    if (
+      stream.length > 0 &&
+      nextCycle.length > 1 &&
+      nextCycle[0].id === stream[stream.length - 1].id
+    ) {
+      [nextCycle[0], nextCycle[nextCycle.length - 1]] = [
+        nextCycle[nextCycle.length - 1],
+        nextCycle[0],
+      ];
+    }
+    stream.push(...nextCycle);
+  }
+
+  return stream.slice(0, targetSize);
+}
+
 /**
- * Anti-cheat unique question distributor:
- * Guarantees Team A and Team B NEVER share the same questions in a match,
- * and prioritizes unseen questions across the whole tournament.
+ * Fair Question Distributor:
+ * 1. STRICTLY isolates questions to the requested level (never bleeds into other levels).
+ *    When `level === 'all'`, draws randomly across Levels 1–6.
+ * 2. Team A and Team B may share the same level's question bank, but each gets an
+ *    independently randomized order AND is guaranteed never to receive the same
+ *    question on the same index/turn (or neighboring indices when pool >= 4).
  */
 export function drawUniqueDecksForMatch(params: {
-  level: GradeLevel;
+  level: GradeLevel | 'all';
   levelSelection: LevelSelection;
   gameMode: GameModeId;
   usedQuestionIds: Set<string>;
@@ -296,67 +331,72 @@ export function drawUniqueDecksForMatch(params: {
   deckB: QuestionItem[];
   newlyUsedIds: string[];
 } {
-  const { level, levelSelection, gameMode, usedQuestionIds, deckSizePerTeam = 22 } = params;
+  const { level, gameMode, usedQuestionIds, deckSizePerTeam = 36 } = params;
 
-  const matchesMode = (q: QuestionItem) =>
-    gameMode === 'campuran' ? true : q.gameType === gameMode;
+  // Strict level filter — NEVER bleed across levels unless 'all' is explicitly selected
+  const levelPool =
+    level === 'all'
+      ? QUESTION_BANK
+      : QUESTION_BANK.filter((q) => q.level === level);
 
-  const primaryPool = shuffleArray(
-    QUESTION_BANK.filter(
-      (q) => q.level === level && matchesMode(q) && !usedQuestionIds.has(q.id)
-    )
-  );
+  const modePool =
+    gameMode === 'campuran'
+      ? levelPool
+      : levelPool.filter((q) => q.gameType === gameMode);
 
-  const nearbyPool = shuffleArray(
-    QUESTION_BANK.filter(
-      (q) =>
-        q.level !== level &&
-        (levelSelection === 'progressive'
-          ? Math.abs(q.level - level) <= 2
-          : Math.abs(q.level - level) <= 3) &&
-        matchesMode(q) &&
-        !usedQuestionIds.has(q.id)
-    )
-  );
+  const activePool = modePool.length > 0 ? modePool : levelPool;
 
-  const restUnseen = shuffleArray(
-    QUESTION_BANK.filter(
-      (q) =>
-        matchesMode(q) &&
-        !usedQuestionIds.has(q.id) &&
-        !primaryPool.some((p) => p.id === q.id) &&
-        !nearbyPool.some((n) => n.id === q.id)
-    )
-  );
+  const rawA = buildRandomizedStream(activePool, usedQuestionIds, deckSizePerTeam);
+  const rawB = buildRandomizedStream(activePool, usedQuestionIds, deckSizePerTeam);
 
-  let fullPool = [...primaryPool, ...nearbyPool, ...restUnseen];
+  // Enforce non-simultaneous order: rawB[i] != rawA[i] (and avoid +/-1 neighbors when possible)
+  if (activePool.length > 1) {
+    for (let i = 0; i < rawB.length; i++) {
+      const conflictsAt = (idx: number, candidateId: string) => {
+        if (rawA[idx]?.id === candidateId) return true;
+        if (activePool.length >= 4) {
+          if (idx > 0 && rawA[idx - 1]?.id === candidateId) return true;
+          if (idx + 1 < rawA.length && rawA[idx + 1]?.id === candidateId) return true;
+        }
+        return false;
+      };
 
-  if (fullPool.length < deckSizePerTeam * 2) {
-    const recycled = shuffleArray(
-      QUESTION_BANK.filter(
-        (q) =>
-          matchesMode(q) &&
-          !fullPool.some((existing) => existing.id === q.id)
-      )
-    );
-    fullPool = [...fullPool, ...recycled];
-  }
-
-  const deckA: QuestionItem[] = [];
-  const deckB: QuestionItem[] = [];
-  const newlyUsedIds: string[] = [];
-
-  for (let i = 0; i < fullPool.length; i++) {
-    const q = prepareQuestionVariant(fullPool[i]);
-    if (i % 2 === 0 && deckA.length < deckSizePerTeam) {
-      deckA.push(q);
-      newlyUsedIds.push(q.id);
-    } else if (i % 2 === 1 && deckB.length < deckSizePerTeam) {
-      deckB.push(q);
-      newlyUsedIds.push(q.id);
+      if (conflictsAt(i, rawB[i].id)) {
+        let swapIdx = -1;
+        for (let j = 0; j < rawB.length; j++) {
+          if (j === i) continue;
+          if (!conflictsAt(i, rawB[j].id) && !conflictsAt(j, rawB[i].id)) {
+            swapIdx = j;
+            break;
+          }
+        }
+        // Fallback: strictly avoid exact same index match at minimum
+        if (swapIdx === -1) {
+          for (let j = 0; j < rawB.length; j++) {
+            if (j === i) continue;
+            if (rawB[j].id !== rawA[i].id && rawB[i].id !== rawA[j].id) {
+              swapIdx = j;
+              break;
+            }
+          }
+        }
+        if (swapIdx !== -1) {
+          [rawB[i], rawB[swapIdx]] = [rawB[swapIdx], rawB[i]];
+        }
+      }
     }
-    if (deckA.length >= deckSizePerTeam && deckB.length >= deckSizePerTeam) break;
   }
 
-  return { deckA, deckB, newlyUsedIds };
+  const deckA = rawA.map(prepareQuestionVariant);
+  const deckB = rawB.map(prepareQuestionVariant);
+
+  const newlyUsedSet = new Set<string>();
+  deckA.forEach((q) => newlyUsedSet.add(q.id));
+  deckB.forEach((q) => newlyUsedSet.add(q.id));
+
+  return {
+    deckA,
+    deckB,
+    newlyUsedIds: Array.from(newlyUsedSet),
+  };
 }

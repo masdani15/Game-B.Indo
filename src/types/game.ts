@@ -1,6 +1,6 @@
 export type GradeLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-export type LevelSelection = GradeLevel | 'progressive';
+export type LevelSelection = GradeLevel | 'progressive' | 'all';
 
 export type GameModeId =
   | 'campuran'
@@ -90,7 +90,7 @@ export interface MatchPairing {
   turnsB: number;
   bestStreakA: number;
   bestStreakB: number;
-  levelUsed: GradeLevel;
+  levelUsed: GradeLevel | 'all';
 }
 
 export type AppScreen = 'SETUP' | 'TOURNAMENT_HUB' | 'ARENA' | 'CHAMPION';
@@ -99,5 +99,5 @@ export interface TournamentConfig {
   teamCount: number;
   levelSelection: LevelSelection;
   gameMode: GameModeId;
-  sessionSeconds: 45 | 60 | 90;
+  sessionSeconds: number;
 }

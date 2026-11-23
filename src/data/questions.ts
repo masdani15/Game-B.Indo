@@ -1,4 +1,5 @@
 import { QuestionItem } from '../types/game';
+import { EXTRA_QUESTIONS } from './questionsExtra';
 
 export const QUESTION_BANK: QuestionItem[] = [
   // ============================================================================
@@ -2151,4 +2152,5 @@ export const QUESTION_BANK: QuestionItem[] = [
     options: ['bahan pembicaraan orang banyak', 'obat sariawan alami', 'hadiah dari kepala desa', 'pidato perpisahan'],
     correctAnswer: 'bahan pembicaraan orang banyak',
   },
+  ...EXTRA_QUESTIONS,
 ];
