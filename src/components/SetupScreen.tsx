@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { GAME_MODE_META, TEAM_THEMES } from '../data/teamThemes';
 import { TournamentConfig } from '../types/game';
+import arenaHeroImg from '../assets/images/arena_hero_classroom_1795397636381.jpg';
 import { TeamEmblem } from './TeamEmblem';
 
 interface SetupScreenProps {
@@ -162,7 +163,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
 
           <div className="lg:col-span-5 rounded-3xl overflow-hidden border-2 border-white shadow-md bg-sky-50 aspect-16/10 lg:aspect-4/3">
             <img
-              src="/src/assets/images/arena_hero_classroom_1795397636381.jpg"
+              src={arenaHeroImg}
               alt="Siswa SD Anugerah Abadi 1 Bengalon bermain kuis Bahasa Indonesia di layar sentuh IFP"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover"

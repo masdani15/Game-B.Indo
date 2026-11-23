@@ -3,6 +3,7 @@ import { Award, Maximize2, Minimize2, RotateCcw, Trophy } from 'lucide-react';
 import { TeamRecord } from '../types/game';
 import { soundEngine } from '../utils/soundEngine';
 import { sortTeamsForLeaderboard } from '../utils/tournamentEngine';
+import trophyChampionImg from '../assets/images/trophy_champion_emblem_1795397636306.jpg';
 import { TeamEmblem } from './TeamEmblem';
 
 interface ChampionScreenProps {
@@ -74,7 +75,7 @@ export const ChampionScreen: React.FC<ChampionScreenProps> = ({
           <div className="md:col-span-5 flex justify-center">
             <div className="w-60 h-60 md:w-72 md:h-72 rounded-3xl overflow-hidden border-2 border-white bg-amber-50 shadow-md">
               <img
-                src="/src/assets/images/trophy_champion_emblem_1795397636306.jpg"
+                src={trophyChampionImg}
                 alt="Piala Juara 1 Kompetisi Bahasa Indonesia SD Anugerah Abadi 1 Bengalon"
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover"
